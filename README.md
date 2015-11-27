@@ -3,7 +3,7 @@
 ## How to use
 
 ```
-docker run --name tmp-mysql --privileged -d mysql-tmpfs
+docker run --name tmp-mysql --privileged -d nicokaiser/mysql-tmpfs
 ```
 
 ## Environment Variables
@@ -26,7 +26,7 @@ GRANT ALL ON *.* TO 'root'@'%' WITH GRANT OPTION ;
 CREATE DATABASE mydatabase ;
 ...
 EOSQL
-docker run --name tmp-mysql --privileged -p 3306:3306 -v $(pwd)/mysql-init:/mysql-init -e MYSQL_INIT_FILE=/mysql-init/init.sql -d mysql-tmpfs
+docker run --name tmp-mysql --privileged -p 3306:3306 -v $(pwd)/mysql-init:/mysql-init -e MYSQL_INIT_FILE=/mysql-init/init.sql -d nicokaiser/mysql-tmpfs
 ```
 
 If no MYSQL_INIT_FILE is given, a default one (root user, no password) is created.
