@@ -7,14 +7,6 @@ if [ "${1:0:1}" = '-' ]; then
 	set -- mysqld "$@"
 fi
 
-MYSQL_TMPFS_SIZE=${MYSQL_TMPFS_SIZE:-"256"}
-
-if [ ! -d "$DATADIR/mysql" ]; then
-	echo "Creating tmpfs with ${MYSQL_TMPFS_SIZE} MB ..."
-	mkdir -p "$DATADIR"
-	mount -t tmpfs -o size="${MYSQL_TMPFS_SIZE}m" tmpfs "$DATADIR"
-fi
-
 if [ "${1%_safe}" = 'mysqld' ]; then
 	echo 'Running mysql_install_db ...'
 	mysql_install_db
