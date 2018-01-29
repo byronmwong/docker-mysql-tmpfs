@@ -1,15 +1,13 @@
 #!/bin/bash
 set -e
 
-DATADIR='/var/lib/mysql'
-
 if [ "${1:0:1}" = '-' ]; then
-	set -- mysqld "$@"
+	set -- mysqld --datadir="$DATADIR" "$@"
 fi
 
 if [ "${1%_safe}" = 'mysqld' ]; then
 	echo 'Running mysql_install_db ...'
-	mysql_install_db
+	mysql_install_db -ldata="$DATADIR"
 	echo 'Finished mysql_install_db'
 
 	if [ -e "$MYSQL_INIT_FILE" ]; then
@@ -19,7 +17,7 @@ if [ "${1%_safe}" = 'mysqld' ]; then
 		# This has to include all privileges, users and databases,
 		# no further SQL is being executed if this file is present
 
-		set -- "$@" --init-file="$MYSQL_INIT_FILE"
+		set -- "$@" --datadir="$DATADIR" --init-file="$MYSQL_INIT_FILE"
 	else
 		echo 'Creating default init file ...'
 		tempSqlFile='/tmp/mysql-init.sql'
@@ -32,10 +30,10 @@ if [ "${1%_safe}" = 'mysqld' ]; then
 		if [ "$MYSQL_DATABASE" ]; then
 			echo "CREATE DATABASE IF NOT EXISTS \`$MYSQL_DATABASE\` ;" >> "$tempSqlFile"
 		fi
-		
+
 		if [ "$MYSQL_USER" -a "$MYSQL_PASSWORD" ]; then
 			echo "CREATE USER '$MYSQL_USER'@'%' IDENTIFIED BY '$MYSQL_PASSWORD' ;" >> "$tempSqlFile"
-			
+
 			if [ "$MYSQL_DATABASE" ]; then
 				echo "GRANT ALL ON \`$MYSQL_DATABASE\`.* TO '$MYSQL_USER'@'%' ;" >> "$tempSqlFile"
 			fi
@@ -43,7 +41,7 @@ if [ "${1%_safe}" = 'mysqld' ]; then
 
 		echo 'FLUSH PRIVILEGES ;' >> "$tempSqlFile"
 
-		set -- "$@" --init-file="$tempSqlFile"
+		set -- "$@" --datadir="$DATADIR" --init-file="$tempSqlFile"
 	fi
 fi
 
